@@ -1,0 +1,1660 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Połów — Księga Utargu</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;0,9..144,900;1,9..144,400&family=JetBrains+Mono:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<style>
+  :root {
+    --bg: #0f1518;
+    --bg-2: #161e22;
+    --bg-3: #1d272c;
+    --line: #2a3940;
+    --ink: #e8e2d4;
+    --ink-dim: #9aa6a8;
+    --ink-faint: #5a6669;
+    --accent: #c98a4b;     /* miedź / mosiądz */
+    --accent-2: #4a9d9c;   /* patyna / morska zieleń */
+    --accent-3: #d4b896;   /* piasek */
+    --danger: #c8553d;
+    --good: #7ea05c;
+    --shadow: 0 20px 50px rgba(0,0,0,.4);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html, body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: 'Fraunces', serif;
+    font-feature-settings: "ss01", "ss02";
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    background:
+      radial-gradient(circle at 15% 20%, rgba(74, 157, 156, .08), transparent 50%),
+      radial-gradient(circle at 85% 70%, rgba(201, 138, 75, .06), transparent 55%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  body::after {
+    content: "";
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' /%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.5'/%3E%3C/svg%3E");
+    opacity: .04;
+    pointer-events: none;
+    z-index: 0;
+    mix-blend-mode: overlay;
+  }
+
+  .app {
+    position: relative;
+    z-index: 1;
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 32px 28px 80px;
+  }
+
+  /* ===== HEADER ===== */
+  header.masthead {
+    border-bottom: 1px solid var(--line);
+    padding-bottom: 24px;
+    margin-bottom: 32px;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 20px;
+    align-items: end;
+  }
+
+  .brand {
+    display: flex;
+    align-items: baseline;
+    gap: 14px;
+  }
+
+  .brand .logo-mark {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-weight: 300;
+    font-size: 56px;
+    line-height: 1;
+    color: var(--accent);
+    letter-spacing: -.02em;
+  }
+
+  .brand h1 {
+    font-family: 'Fraunces', serif;
+    font-weight: 600;
+    font-size: 38px;
+    letter-spacing: -.03em;
+    line-height: 1;
+  }
+  .brand h1 em {
+    font-style: italic;
+    font-weight: 300;
+    color: var(--accent-3);
+  }
+
+  .brand .tag {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    color: var(--ink-faint);
+    letter-spacing: .25em;
+    text-transform: uppercase;
+    margin-top: 6px;
+    display: block;
+  }
+
+  .toolbar {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  .btn {
+    background: transparent;
+    color: var(--ink);
+    border: 1px solid var(--line);
+    padding: 10px 16px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all .2s ease;
+    border-radius: 0;
+  }
+  .btn:hover { background: var(--bg-3); border-color: var(--accent); color: var(--accent); }
+  .btn.primary { background: var(--accent); color: var(--bg); border-color: var(--accent); }
+  .btn.primary:hover { background: var(--accent-3); border-color: var(--accent-3); color: var(--bg); }
+  .btn.ghost-acc { color: var(--accent-2); border-color: var(--accent-2); }
+  .btn.ghost-acc:hover { background: var(--accent-2); color: var(--bg); }
+  .btn.small { padding: 6px 12px; font-size: 10px; }
+  .btn.danger { color: var(--danger); border-color: var(--danger); }
+  .btn.danger:hover { background: var(--danger); color: var(--bg); }
+
+  /* ===== TABS ===== */
+  .tabs {
+    display: flex;
+    gap: 0;
+    border-bottom: 1px solid var(--line);
+    margin-bottom: 36px;
+    overflow-x: auto;
+  }
+  .tab {
+    background: transparent;
+    border: 0;
+    color: var(--ink-dim);
+    padding: 14px 22px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: .2em;
+    text-transform: uppercase;
+    cursor: pointer;
+    position: relative;
+    white-space: nowrap;
+    transition: color .2s;
+  }
+  .tab:hover { color: var(--ink); }
+  .tab.active { color: var(--accent); }
+  .tab.active::after {
+    content: "";
+    position: absolute;
+    left: 0; right: 0; bottom: -1px;
+    height: 2px;
+    background: var(--accent);
+  }
+  .tab .num {
+    color: var(--ink-faint);
+    margin-right: 8px;
+    font-weight: 300;
+  }
+  .tab.active .num { color: var(--accent); }
+
+  /* ===== PANELS ===== */
+  .panel { display: none; animation: fade .4s ease; }
+  .panel.active { display: block; }
+  @keyframes fade {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ===== CALENDAR / DAY GRID ===== */
+  .week-nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 24px;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+  .week-nav h2 {
+    font-family: 'Fraunces', serif;
+    font-weight: 400;
+    font-size: 28px;
+    letter-spacing: -.02em;
+  }
+  .week-nav h2 em { font-style: italic; color: var(--accent-3); font-weight: 300; }
+  .week-nav .nav-buttons { display: flex; gap: 6px; }
+  .nav-btn {
+    width: 36px; height: 36px;
+    background: transparent;
+    border: 1px solid var(--line);
+    color: var(--ink);
+    cursor: pointer;
+    font-family: 'Fraunces', serif;
+    font-size: 18px;
+    transition: all .2s;
+  }
+  .nav-btn:hover { background: var(--accent); color: var(--bg); border-color: var(--accent); }
+
+  .week-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 1px;
+    background: var(--line);
+    border: 1px solid var(--line);
+  }
+
+  .day-card {
+    background: var(--bg-2);
+    padding: 18px 16px;
+    min-height: 130px;
+    cursor: pointer;
+    transition: all .25s;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+  .day-card:hover { background: var(--bg-3); }
+  .day-card.today {
+    background: linear-gradient(135deg, var(--bg-2) 60%, rgba(201, 138, 75, .08));
+  }
+  .day-card.today::before {
+    content: "";
+    position: absolute;
+    top: 0; left: 0;
+    width: 3px; height: 100%;
+    background: var(--accent);
+  }
+  .day-card.has-data {
+    border-bottom: 2px solid var(--accent-2);
+  }
+
+  .day-head { display: flex; justify-content: space-between; align-items: baseline; }
+  .day-name {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: .2em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+  }
+  .day-num {
+    font-family: 'Fraunces', serif;
+    font-weight: 300;
+    font-size: 32px;
+    line-height: 1;
+    letter-spacing: -.04em;
+  }
+  .day-card.today .day-num { color: var(--accent); }
+
+  .day-amount {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 16px;
+    font-weight: 500;
+    color: var(--accent);
+    margin-top: 8px;
+  }
+  .day-amount.empty { color: var(--ink-faint); font-weight: 300; }
+  .day-amount .cur {
+    font-size: 10px;
+    color: var(--ink-faint);
+    margin-left: 2px;
+  }
+
+  /* ===== STATS ROW ===== */
+  .stats-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1px;
+    background: var(--line);
+    border: 1px solid var(--line);
+    margin-top: 32px;
+  }
+  .stat-cell {
+    background: var(--bg-2);
+    padding: 22px 20px;
+  }
+  .stat-cell .label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: .2em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    margin-bottom: 8px;
+  }
+  .stat-cell .value {
+    font-family: 'Fraunces', serif;
+    font-weight: 400;
+    font-size: 30px;
+    letter-spacing: -.02em;
+    color: var(--ink);
+  }
+  .stat-cell .value em { font-style: italic; font-weight: 300; color: var(--accent-3); }
+  .stat-cell .value.profit { color: var(--good); }
+  .stat-cell .value.loss { color: var(--danger); }
+  .stat-cell .sub {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--ink-dim);
+    margin-top: 4px;
+  }
+
+  /* ===== MODAL ===== */
+  .modal-bg {
+    position: fixed;
+    inset: 0;
+    background: rgba(8, 12, 14, .82);
+    backdrop-filter: blur(6px);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 100;
+    padding: 20px;
+    animation: fade .2s ease;
+  }
+  .modal-bg.show { display: flex; }
+  .modal {
+    background: var(--bg-2);
+    border: 1px solid var(--line);
+    width: 100%;
+    max-width: 540px;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: var(--shadow);
+    animation: slideUp .3s ease;
+  }
+  @keyframes slideUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .modal-head {
+    padding: 24px 28px;
+    border-bottom: 1px solid var(--line);
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+  }
+  .modal-head h3 {
+    font-family: 'Fraunces', serif;
+    font-weight: 400;
+    font-size: 26px;
+    letter-spacing: -.02em;
+  }
+  .modal-head h3 em { font-style: italic; color: var(--accent-3); font-weight: 300; }
+  .close-btn {
+    background: transparent;
+    border: 0;
+    color: var(--ink-dim);
+    font-size: 24px;
+    cursor: pointer;
+    line-height: 1;
+    font-family: 'Fraunces', serif;
+  }
+  .close-btn:hover { color: var(--accent); }
+
+  .modal-body { padding: 28px; }
+  .modal-foot {
+    padding: 18px 28px;
+    border-top: 1px solid var(--line);
+    display: flex;
+    gap: 8px;
+    justify-content: flex-end;
+  }
+
+  /* ===== FORMS ===== */
+  label.field {
+    display: block;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: .2em;
+    text-transform: uppercase;
+    color: var(--ink-dim);
+    margin-bottom: 8px;
+    margin-top: 16px;
+  }
+  label.field:first-child { margin-top: 0; }
+
+  input[type="text"], input[type="number"], input[type="date"], select, textarea {
+    width: 100%;
+    background: var(--bg);
+    border: 1px solid var(--line);
+    color: var(--ink);
+    padding: 12px 14px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 14px;
+    transition: border-color .2s;
+  }
+  input:focus, select:focus, textarea:focus {
+    outline: none;
+    border-color: var(--accent);
+  }
+  input[type="number"] {
+    font-family: 'Fraunces', serif;
+    font-size: 22px;
+    font-weight: 400;
+    letter-spacing: -.01em;
+  }
+
+  /* ===== FISH PANEL ===== */
+  .section-title {
+    font-family: 'Fraunces', serif;
+    font-weight: 400;
+    font-size: 32px;
+    letter-spacing: -.02em;
+    margin-bottom: 4px;
+  }
+  .section-title em { font-style: italic; color: var(--accent-3); font-weight: 300; }
+  .section-sub {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--ink-faint);
+    letter-spacing: .15em;
+    text-transform: uppercase;
+    margin-bottom: 28px;
+  }
+
+  .fish-types-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 12px;
+    margin-bottom: 36px;
+  }
+  .fish-chip {
+    background: var(--bg-2);
+    border: 1px solid var(--line);
+    padding: 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: border-color .2s;
+  }
+  .fish-chip:hover { border-color: var(--accent-2); }
+  .fish-chip .name {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-size: 18px;
+    color: var(--ink);
+  }
+  .fish-chip .remove {
+    background: transparent;
+    border: 0;
+    color: var(--ink-faint);
+    font-size: 18px;
+    cursor: pointer;
+    line-height: 1;
+  }
+  .fish-chip .remove:hover { color: var(--danger); }
+
+  .add-fish-form {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 36px;
+  }
+  .add-fish-form input { flex: 1; }
+
+  .order-row {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr auto;
+    gap: 8px;
+    align-items: center;
+    margin-bottom: 8px;
+  }
+  .order-row select, .order-row input { font-size: 13px; padding: 10px 12px; }
+
+  .order-list {
+    background: var(--bg-2);
+    border: 1px solid var(--line);
+    padding: 4px;
+    margin-bottom: 16px;
+  }
+  .order-item {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr auto;
+    gap: 12px;
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--line);
+    align-items: center;
+  }
+  .order-item:last-child { border-bottom: 0; }
+  .order-item .o-name {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-size: 16px;
+  }
+  .order-item .o-num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    color: var(--ink-dim);
+  }
+  .order-item .o-num.acc { color: var(--accent); }
+  .remove-order {
+    background: transparent;
+    border: 0;
+    color: var(--ink-faint);
+    cursor: pointer;
+    font-size: 16px;
+  }
+  .remove-order:hover { color: var(--danger); }
+
+  /* ===== ORDERS BY WEEK ===== */
+  .week-orders-card {
+    background: var(--bg-2);
+    border: 1px solid var(--line);
+    padding: 24px;
+    margin-bottom: 24px;
+  }
+  .week-orders-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 16px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--line);
+  }
+  .week-orders-head h4 {
+    font-family: 'Fraunces', serif;
+    font-weight: 400;
+    font-size: 22px;
+    letter-spacing: -.01em;
+  }
+  .week-orders-head h4 em { font-style: italic; color: var(--accent-3); }
+  .week-orders-head .total {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 16px;
+    color: var(--accent);
+    font-weight: 500;
+  }
+
+  /* ===== CHARTS ===== */
+  .chart-card {
+    background: var(--bg-2);
+    border: 1px solid var(--line);
+    padding: 24px;
+    margin-bottom: 24px;
+  }
+  .chart-card h4 {
+    font-family: 'Fraunces', serif;
+    font-weight: 400;
+    font-size: 22px;
+    margin-bottom: 4px;
+    letter-spacing: -.01em;
+  }
+  .chart-card h4 em { font-style: italic; color: var(--accent-3); }
+  .chart-card .chart-sub {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: .2em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    margin-bottom: 18px;
+  }
+  .chart-wrap {
+    position: relative;
+    height: 280px;
+  }
+
+  .empty-state {
+    text-align: center;
+    padding: 60px 20px;
+    color: var(--ink-faint);
+  }
+  .empty-state .icon {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-size: 60px;
+    color: var(--accent);
+    opacity: .3;
+    margin-bottom: 16px;
+  }
+  .empty-state p {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-size: 18px;
+  }
+
+  /* ===== TOAST ===== */
+  .toast {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%) translateY(100px);
+    background: var(--bg-3);
+    border: 1px solid var(--accent);
+    color: var(--ink);
+    padding: 14px 24px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    box-shadow: var(--shadow);
+    z-index: 200;
+    transition: transform .35s cubic-bezier(.2, .9, .3, 1.2);
+  }
+  .toast.show { transform: translateX(-50%) translateY(0); }
+  .toast.danger { border-color: var(--danger); }
+
+  /* ===== YEAR / MONTH SUMMARIES ===== */
+  .month-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 12px;
+    margin-bottom: 32px;
+  }
+  .month-card {
+    background: var(--bg-2);
+    border: 1px solid var(--line);
+    padding: 18px;
+    transition: border-color .2s;
+  }
+  .month-card:hover { border-color: var(--accent); }
+  .month-card .m-name {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-size: 18px;
+    color: var(--ink);
+    margin-bottom: 10px;
+  }
+  .month-card .m-rev {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 16px;
+    color: var(--accent);
+    font-weight: 500;
+  }
+  .month-card .m-cost {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--ink-dim);
+    margin-top: 4px;
+  }
+  .month-card .m-profit {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    margin-top: 8px;
+    padding-top: 8px;
+    border-top: 1px solid var(--line);
+  }
+  .month-card .m-profit.pos { color: var(--good); }
+  .month-card .m-profit.neg { color: var(--danger); }
+
+  .year-select {
+    display: inline-flex;
+    gap: 4px;
+    background: var(--bg-2);
+    border: 1px solid var(--line);
+    padding: 4px;
+    margin-bottom: 24px;
+  }
+  .year-btn {
+    background: transparent;
+    border: 0;
+    color: var(--ink-dim);
+    padding: 8px 16px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    cursor: pointer;
+    transition: all .2s;
+  }
+  .year-btn.active { background: var(--accent); color: var(--bg); }
+
+  hr.fancy {
+    border: 0;
+    height: 1px;
+    background: linear-gradient(to right, transparent, var(--line), transparent);
+    margin: 32px 0;
+  }
+
+  @media (max-width: 760px) {
+    .app { padding: 20px 14px 60px; }
+    header.masthead { grid-template-columns: 1fr; }
+    .brand .logo-mark { font-size: 42px; }
+    .brand h1 { font-size: 28px; }
+    .week-grid {
+      grid-template-columns: 1fr 1fr;
+    }
+    .day-card { min-height: 100px; }
+    .order-row, .order-item {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+</style>
+</head>
+<body>
+
+<div class="app">
+
+  <!-- HEADER -->
+  <header class="masthead">
+    <div class="brand">
+      <span class="logo-mark">~</span>
+      <div>
+        <h1>Połów &mdash; <em>Księga Utargu</em></h1>
+        <span class="tag">Codzienna ewidencja • Zamówienia ryb • Statystyki</span>
+      </div>
+    </div>
+    <div class="toolbar">
+      <button class="btn ghost-acc" onclick="exportJSON()">↓ Eksport</button>
+      <button class="btn ghost-acc" onclick="document.getElementById('importFile').click()">↑ Import</button>
+      <input type="file" id="importFile" accept="application/json" style="display:none" onchange="importJSON(event)">
+    </div>
+  </header>
+
+  <!-- TABS -->
+  <nav class="tabs">
+    <button class="tab active" data-tab="daily"><span class="num">01</span>Tydzień</button>
+    <button class="tab" data-tab="orders"><span class="num">02</span>Zamówienia</button>
+    <button class="tab" data-tab="fish"><span class="num">03</span>Ryby</button>
+    <button class="tab" data-tab="stats"><span class="num">04</span>Statystyki</button>
+    <button class="tab" data-tab="year"><span class="num">05</span>Rok</button>
+  </nav>
+
+  <!-- ===== PANEL: DAILY ===== -->
+  <section class="panel active" id="panel-daily">
+    <div class="week-nav">
+      <h2 id="weekTitle">Tydzień <em>—</em></h2>
+      <div class="nav-buttons">
+        <button class="nav-btn" onclick="changeWeek(-1)">←</button>
+        <button class="nav-btn" onclick="changeWeek(0)">●</button>
+        <button class="nav-btn" onclick="changeWeek(1)">→</button>
+      </div>
+    </div>
+
+    <div class="week-grid" id="weekGrid"></div>
+
+    <div class="stats-row" id="weekStatsRow"></div>
+  </section>
+
+  <!-- ===== PANEL: ORDERS ===== -->
+  <section class="panel" id="panel-orders">
+    <h2 class="section-title">Zamówienia <em>ryb</em></h2>
+    <p class="section-sub">Zarejestrowane w bieżącym tygodniu &amp; archiwum</p>
+
+    <div class="week-nav">
+      <h2 id="ordersWeekTitle" style="font-size: 22px;">Tydzień <em>—</em></h2>
+      <div class="nav-buttons">
+        <button class="nav-btn" onclick="changeOrdersWeek(-1)">←</button>
+        <button class="nav-btn" onclick="changeOrdersWeek(0)">●</button>
+        <button class="nav-btn" onclick="changeOrdersWeek(1)">→</button>
+      </div>
+    </div>
+
+    <div class="week-orders-card">
+      <div class="week-orders-head">
+        <h4>Dodaj <em>zamówienie</em></h4>
+      </div>
+
+      <div id="orderRows"></div>
+
+      <button class="btn small" onclick="addOrderRow()">+ Dodaj rybę</button>
+      <button class="btn primary small" style="margin-left: 8px;" onclick="saveOrders()">Zapisz tydzień</button>
+    </div>
+
+    <div id="ordersHistory"></div>
+  </section>
+
+  <!-- ===== PANEL: FISH ===== -->
+  <section class="panel" id="panel-fish">
+    <h2 class="section-title">Gatunki <em>ryb</em></h2>
+    <p class="section-sub">Słownik dostępnych gatunków</p>
+
+    <div class="add-fish-form">
+      <input type="text" id="newFishName" placeholder="np. Łosoś atlantycki, Dorsz, Pstrąg...">
+      <button class="btn primary" onclick="addFishType()">+ Dodaj gatunek</button>
+    </div>
+
+    <div class="fish-types-grid" id="fishTypesGrid"></div>
+  </section>
+
+  <!-- ===== PANEL: STATS ===== -->
+  <section class="panel" id="panel-stats">
+    <h2 class="section-title">Statystyki <em>i wykresy</em></h2>
+    <p class="section-sub">Analiza tygodniowa, miesięczna, podsumowania kosztów</p>
+
+    <div class="stats-row" id="globalStatsRow"></div>
+
+    <hr class="fancy">
+
+    <div class="chart-card">
+      <h4>Utarg <em>tygodniowy</em></h4>
+      <p class="chart-sub">Ostatnie 12 tygodni</p>
+      <div class="chart-wrap"><canvas id="weeklyChart"></canvas></div>
+    </div>
+
+    <div class="chart-card">
+      <h4>Utarg <em>vs.</em> koszty ryb</h4>
+      <p class="chart-sub">Porównanie miesięczne — bieżący rok</p>
+      <div class="chart-wrap"><canvas id="monthlyChart"></canvas></div>
+    </div>
+
+    <div class="chart-card">
+      <h4>Zamówione <em>kilogramy</em></h4>
+      <p class="chart-sub">Według gatunku — łącznie</p>
+      <div class="chart-wrap"><canvas id="fishChart"></canvas></div>
+    </div>
+  </section>
+
+  <!-- ===== PANEL: YEAR ===== -->
+  <section class="panel" id="panel-year">
+    <h2 class="section-title">Podsumowanie <em>roczne</em></h2>
+    <p class="section-sub">Miesiąc po miesiącu</p>
+
+    <div class="year-select" id="yearSelect"></div>
+
+    <div class="stats-row" id="yearStatsRow"></div>
+
+    <hr class="fancy">
+
+    <div class="month-grid" id="monthGrid"></div>
+  </section>
+
+</div>
+
+<!-- ===== DAY MODAL ===== -->
+<div class="modal-bg" id="dayModal">
+  <div class="modal">
+    <div class="modal-head">
+      <h3 id="dayModalTitle">Dzień</h3>
+      <button class="close-btn" onclick="closeDayModal()">×</button>
+    </div>
+    <div class="modal-body">
+      <label class="field" for="dayAmount">Utarg dnia (zł)</label>
+      <input type="number" id="dayAmount" step="0.01" placeholder="0.00">
+
+      <label class="field" for="dayNote">Notatka (opcjonalnie)</label>
+      <textarea id="dayNote" rows="2" style="font-family: 'Fraunces', serif; font-size: 15px;" placeholder="np. dobry dzień, dużo turystów..."></textarea>
+    </div>
+    <div class="modal-foot">
+      <button class="btn danger" onclick="clearDay()">Usuń</button>
+      <button class="btn" onclick="closeDayModal()">Anuluj</button>
+      <button class="btn primary" onclick="saveDay()">Zapisz</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast">Zapisano</div>
+
+<script>
+/* =========================================================
+   STAN APLIKACJI
+   ========================================================= */
+const STORAGE_KEY = 'polow_v1';
+
+let state = {
+  revenues: {},     // { 'YYYY-MM-DD': { amount: number, note: string } }
+  fishTypes: [],    // [{ id, name }]
+  orders: {},       // { 'YYYY-WW': [{ fishId, kg, cost }, ...] }
+};
+
+let currentWeekStart = startOfWeek(new Date());
+let ordersWeekStart  = startOfWeek(new Date());
+let editingDay = null;
+let currentYear = new Date().getFullYear();
+let charts = {};
+
+/* =========================================================
+   STORAGE
+   ========================================================= */
+function load() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      state = Object.assign(state, parsed);
+    }
+  } catch(e) { console.warn('Load error', e); }
+
+  // domyślne ryby przy pierwszym uruchomieniu
+  if (!state.fishTypes || state.fishTypes.length === 0) {
+    state.fishTypes = [
+      { id: uid(), name: 'Łosoś' },
+      { id: uid(), name: 'Dorsz' },
+      { id: uid(), name: 'Pstrąg' },
+    ];
+    save();
+  }
+}
+function save() {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+}
+
+/* =========================================================
+   POMOCNICZE
+   ========================================================= */
+function uid() {
+  return Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
+}
+
+function pad(n) { return n.toString().padStart(2, '0'); }
+
+function fmtDate(d) {
+  return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+}
+
+function startOfWeek(d) {
+  const date = new Date(d);
+  date.setHours(0,0,0,0);
+  const day = date.getDay();
+  const diff = (day === 0 ? -6 : 1 - day); // poniedziałek = start
+  date.setDate(date.getDate() + diff);
+  return date;
+}
+
+function addDays(d, n) {
+  const r = new Date(d);
+  r.setDate(r.getDate() + n);
+  return r;
+}
+
+function getWeekKey(d) {
+  // ISO week
+  const date = new Date(d.valueOf());
+  date.setHours(0,0,0,0);
+  date.setDate(date.getDate() + 3 - (date.getDay() + 6) % 7);
+  const week1 = new Date(date.getFullYear(), 0, 4);
+  const weekNum = 1 + Math.round(((date - week1) / 86400000 - 3 + (week1.getDay() + 6) % 7) / 7);
+  return `${date.getFullYear()}-W${pad(weekNum)}`;
+}
+
+function fmtMoney(n) {
+  if (n === undefined || n === null || isNaN(n)) return '—';
+  return new Intl.NumberFormat('pl-PL', {minimumFractionDigits: 2, maximumFractionDigits: 2}).format(n);
+}
+
+function fmtKg(n) {
+  if (!n) return '0';
+  return new Intl.NumberFormat('pl-PL', {maximumFractionDigits: 2}).format(n);
+}
+
+const dayNames = ['Pon','Wto','Śro','Czw','Pią','Sob','Nie'];
+const monthNames = ['Styczeń','Luty','Marzec','Kwiecień','Maj','Czerwiec','Lipiec','Sierpień','Wrzesień','Październik','Listopad','Grudzień'];
+
+function fmtWeekRange(start) {
+  const end = addDays(start, 6);
+  const sameMonth = start.getMonth() === end.getMonth();
+  if (sameMonth) {
+    return `${start.getDate()}–${end.getDate()} ${monthNames[end.getMonth()]} ${end.getFullYear()}`;
+  }
+  return `${start.getDate()} ${monthNames[start.getMonth()].slice(0,3)} – ${end.getDate()} ${monthNames[end.getMonth()].slice(0,3)} ${end.getFullYear()}`;
+}
+
+function toast(msg, danger=false) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.toggle('danger', danger);
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2200);
+}
+
+/* =========================================================
+   TABS
+   ========================================================= */
+document.querySelectorAll('.tab').forEach(t => {
+  t.addEventListener('click', () => {
+    document.querySelectorAll('.tab').forEach(x => x.classList.remove('active'));
+    document.querySelectorAll('.panel').forEach(x => x.classList.remove('active'));
+    t.classList.add('active');
+    const tab = t.dataset.tab;
+    document.getElementById('panel-' + tab).classList.add('active');
+
+    if (tab === 'stats') renderStats();
+    if (tab === 'year') renderYear();
+    if (tab === 'fish') renderFishTypes();
+    if (tab === 'orders') renderOrdersPanel();
+  });
+});
+
+/* =========================================================
+   PANEL: TYDZIEŃ
+   ========================================================= */
+function changeWeek(dir) {
+  if (dir === 0) currentWeekStart = startOfWeek(new Date());
+  else currentWeekStart = addDays(currentWeekStart, dir * 7);
+  renderWeek();
+}
+
+function renderWeek() {
+  document.getElementById('weekTitle').innerHTML = `Tydzień <em>${fmtWeekRange(currentWeekStart)}</em>`;
+  const grid = document.getElementById('weekGrid');
+  grid.innerHTML = '';
+  const todayStr = fmtDate(new Date());
+
+  for (let i = 0; i < 7; i++) {
+    const d = addDays(currentWeekStart, i);
+    const key = fmtDate(d);
+    const data = state.revenues[key];
+    const isToday = key === todayStr;
+
+    const card = document.createElement('div');
+    card.className = 'day-card' + (isToday ? ' today' : '') + (data ? ' has-data' : '');
+    card.innerHTML = `
+      <div>
+        <div class="day-head">
+          <span class="day-name">${dayNames[i]}</span>
+          <span class="day-num">${d.getDate()}</span>
+        </div>
+      </div>
+      <div class="day-amount ${data ? '' : 'empty'}">
+        ${data ? fmtMoney(data.amount) + '<span class="cur"> zł</span>' : '— —'}
+      </div>
+    `;
+    card.addEventListener('click', () => openDayModal(key));
+    grid.appendChild(card);
+  }
+
+  renderWeekStats();
+}
+
+function renderWeekStats() {
+  const row = document.getElementById('weekStatsRow');
+  let total = 0, count = 0, max = 0, maxDay = '';
+
+  for (let i = 0; i < 7; i++) {
+    const d = addDays(currentWeekStart, i);
+    const key = fmtDate(d);
+    const data = state.revenues[key];
+    if (data && data.amount) {
+      total += data.amount;
+      count++;
+      if (data.amount > max) {
+        max = data.amount;
+        maxDay = dayNames[i];
+      }
+    }
+  }
+
+  const avg = count ? total / count : 0;
+
+  // koszty z zamówień tego tygodnia
+  const wk = getWeekKey(currentWeekStart);
+  const orders = state.orders[wk] || [];
+  const cost = orders.reduce((s, o) => s + (o.cost || 0), 0);
+  const profit = total - cost;
+
+  row.innerHTML = `
+    <div class="stat-cell">
+      <div class="label">Utarg tygodnia</div>
+      <div class="value">${fmtMoney(total)}<em> zł</em></div>
+      <div class="sub">${count} dni z wpisem</div>
+    </div>
+    <div class="stat-cell">
+      <div class="label">Średnio dziennie</div>
+      <div class="value">${fmtMoney(avg)}<em> zł</em></div>
+      <div class="sub">na podstawie ${count} dni</div>
+    </div>
+    <div class="stat-cell">
+      <div class="label">Koszt ryb</div>
+      <div class="value">${fmtMoney(cost)}<em> zł</em></div>
+      <div class="sub">${orders.length} pozycji</div>
+    </div>
+    <div class="stat-cell">
+      <div class="label">Zysk netto</div>
+      <div class="value ${profit >= 0 ? 'profit' : 'loss'}">${fmtMoney(profit)}<em> zł</em></div>
+      <div class="sub">${maxDay ? 'najlepszy: ' + maxDay : '—'}</div>
+    </div>
+  `;
+}
+
+/* =========================================================
+   MODAL DNIA
+   ========================================================= */
+function openDayModal(dateKey) {
+  editingDay = dateKey;
+  const d = new Date(dateKey);
+  const titleStr = `${dayNames[(d.getDay()+6)%7]} <em>${d.getDate()} ${monthNames[d.getMonth()]}</em>`;
+  document.getElementById('dayModalTitle').innerHTML = titleStr;
+  const data = state.revenues[dateKey] || {};
+  document.getElementById('dayAmount').value = data.amount || '';
+  document.getElementById('dayNote').value = data.note || '';
+  document.getElementById('dayModal').classList.add('show');
+  setTimeout(() => document.getElementById('dayAmount').focus(), 100);
+}
+
+function closeDayModal() {
+  document.getElementById('dayModal').classList.remove('show');
+  editingDay = null;
+}
+
+function saveDay() {
+  if (!editingDay) return;
+  const amt = parseFloat(document.getElementById('dayAmount').value);
+  const note = document.getElementById('dayNote').value.trim();
+
+  if (isNaN(amt) || amt < 0) {
+    if (state.revenues[editingDay]) {
+      delete state.revenues[editingDay];
+      save();
+      renderWeek();
+      closeDayModal();
+      toast('Wpis usunięty');
+      return;
+    }
+    toast('Podaj poprawną kwotę', true);
+    return;
+  }
+
+  state.revenues[editingDay] = { amount: amt, note };
+  save();
+  renderWeek();
+  closeDayModal();
+  toast('Zapisano utarg');
+}
+
+function clearDay() {
+  if (!editingDay) return;
+  if (state.revenues[editingDay]) {
+    delete state.revenues[editingDay];
+    save();
+    renderWeek();
+    toast('Wpis usunięty');
+  }
+  closeDayModal();
+}
+
+document.getElementById('dayModal').addEventListener('click', (e) => {
+  if (e.target.id === 'dayModal') closeDayModal();
+});
+
+/* =========================================================
+   PANEL: RYBY
+   ========================================================= */
+function renderFishTypes() {
+  const grid = document.getElementById('fishTypesGrid');
+  if (state.fishTypes.length === 0) {
+    grid.innerHTML = '<div class="empty-state"><div class="icon">~</div><p>Brak gatunków. Dodaj pierwszy powyżej.</p></div>';
+    return;
+  }
+  grid.innerHTML = state.fishTypes.map(f => `
+    <div class="fish-chip">
+      <span class="name">${escapeHtml(f.name)}</span>
+      <button class="remove" onclick="removeFishType('${f.id}')" title="Usuń">×</button>
+    </div>
+  `).join('');
+}
+
+function addFishType() {
+  const inp = document.getElementById('newFishName');
+  const name = inp.value.trim();
+  if (!name) { toast('Podaj nazwę', true); return; }
+  state.fishTypes.push({ id: uid(), name });
+  inp.value = '';
+  save();
+  renderFishTypes();
+  toast('Dodano gatunek');
+}
+
+function removeFishType(id) {
+  if (!confirm('Usunąć ten gatunek? Istniejące zamówienia zostaną zachowane.')) return;
+  state.fishTypes = state.fishTypes.filter(f => f.id !== id);
+  save();
+  renderFishTypes();
+  toast('Usunięto gatunek');
+}
+
+document.getElementById('newFishName').addEventListener('keypress', (e) => {
+  if (e.key === 'Enter') addFishType();
+});
+
+function escapeHtml(s) {
+  return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+/* =========================================================
+   PANEL: ZAMÓWIENIA
+   ========================================================= */
+function changeOrdersWeek(dir) {
+  if (dir === 0) ordersWeekStart = startOfWeek(new Date());
+  else ordersWeekStart = addDays(ordersWeekStart, dir * 7);
+  renderOrdersPanel();
+}
+
+function renderOrdersPanel() {
+  document.getElementById('ordersWeekTitle').innerHTML = `Tydzień <em>${fmtWeekRange(ordersWeekStart)}</em>`;
+  const wk = getWeekKey(ordersWeekStart);
+  const existing = state.orders[wk] || [];
+
+  // wczytaj istniejące do formularza
+  const rows = document.getElementById('orderRows');
+  rows.innerHTML = '';
+  if (existing.length === 0) {
+    addOrderRow();
+  } else {
+    existing.forEach(o => addOrderRow(o));
+  }
+
+  renderOrdersHistory();
+}
+
+function addOrderRow(data = {}) {
+  const rows = document.getElementById('orderRows');
+  const idx = rows.children.length;
+  const row = document.createElement('div');
+  row.className = 'order-row';
+
+  const fishOpts = state.fishTypes.map(f =>
+    `<option value="${f.id}" ${data.fishId === f.id ? 'selected' : ''}>${escapeHtml(f.name)}</option>`
+  ).join('');
+
+  row.innerHTML = `
+    <select class="o-fish">
+      <option value="">— wybierz gatunek —</option>
+      ${fishOpts}
+    </select>
+    <input type="number" class="o-kg" step="0.01" placeholder="kg" value="${data.kg || ''}">
+    <input type="number" class="o-cost" step="0.01" placeholder="koszt zł" value="${data.cost || ''}">
+    <button class="remove-order" onclick="this.parentElement.remove()">×</button>
+  `;
+  rows.appendChild(row);
+}
+
+function saveOrders() {
+  const wk = getWeekKey(ordersWeekStart);
+  const rows = document.querySelectorAll('#orderRows .order-row');
+  const orders = [];
+
+  rows.forEach(r => {
+    const fishId = r.querySelector('.o-fish').value;
+    const kg = parseFloat(r.querySelector('.o-kg').value);
+    const cost = parseFloat(r.querySelector('.o-cost').value);
+    if (fishId && !isNaN(kg) && kg > 0) {
+      orders.push({
+        fishId,
+        kg,
+        cost: isNaN(cost) ? 0 : cost
+      });
+    }
+  });
+
+  if (orders.length === 0) {
+    delete state.orders[wk];
+  } else {
+    state.orders[wk] = orders;
+  }
+  save();
+  renderOrdersPanel();
+  renderWeekStats();
+  toast('Zamówienia zapisane');
+}
+
+function renderOrdersHistory() {
+  const cont = document.getElementById('ordersHistory');
+  const keys = Object.keys(state.orders).sort().reverse();
+
+  if (keys.length === 0) {
+    cont.innerHTML = '<div class="empty-state"><div class="icon">~</div><p>Brak zamówień. Dodaj pierwsze powyżej.</p></div>';
+    return;
+  }
+
+  cont.innerHTML = '<h3 style="font-family:Fraunces,serif; font-weight:400; font-size:24px; margin: 32px 0 16px;">Archiwum <em style="font-style:italic; color:var(--accent-3);">tygodni</em></h3>';
+
+  keys.slice(0, 12).forEach(wk => {
+    const orders = state.orders[wk];
+    const total = orders.reduce((s, o) => s + (o.cost || 0), 0);
+    const totalKg = orders.reduce((s, o) => s + (o.kg || 0), 0);
+
+    const card = document.createElement('div');
+    card.className = 'week-orders-card';
+    card.innerHTML = `
+      <div class="week-orders-head">
+        <h4>${wk.replace('-W', ' / tydzień ')} <em style="font-style:italic; color:var(--ink-faint); font-size:14px; margin-left:8px;">${fmtKg(totalKg)} kg</em></h4>
+        <span class="total">${fmtMoney(total)} zł</span>
+      </div>
+      <div class="order-list">
+        ${orders.map(o => {
+          const fish = state.fishTypes.find(f => f.id === o.fishId);
+          return `<div class="order-item">
+            <span class="o-name">${fish ? escapeHtml(fish.name) : '<span style="color:var(--ink-faint)">[usunięty gatunek]</span>'}</span>
+            <span class="o-num">${fmtKg(o.kg)} kg</span>
+            <span class="o-num acc">${fmtMoney(o.cost)} zł</span>
+            <span></span>
+          </div>`;
+        }).join('')}
+      </div>
+    `;
+    cont.appendChild(card);
+  });
+}
+
+/* =========================================================
+   PANEL: STATYSTYKI
+   ========================================================= */
+function renderStats() {
+  // globalne staty
+  const allRev = Object.values(state.revenues).reduce((s, r) => s + (r.amount || 0), 0);
+  const allCost = Object.values(state.orders).flat().reduce((s, o) => s + (o.cost || 0), 0);
+  const allKg = Object.values(state.orders).flat().reduce((s, o) => s + (o.kg || 0), 0);
+  const profit = allRev - allCost;
+
+  const days = Object.keys(state.revenues).length;
+  const avgDay = days ? allRev / days : 0;
+
+  document.getElementById('globalStatsRow').innerHTML = `
+    <div class="stat-cell">
+      <div class="label">Utarg łącznie</div>
+      <div class="value">${fmtMoney(allRev)}<em> zł</em></div>
+      <div class="sub">${days} dni odnotowanych</div>
+    </div>
+    <div class="stat-cell">
+      <div class="label">Koszt ryb łącznie</div>
+      <div class="value">${fmtMoney(allCost)}<em> zł</em></div>
+      <div class="sub">${fmtKg(allKg)} kg</div>
+    </div>
+    <div class="stat-cell">
+      <div class="label">Zysk łącznie</div>
+      <div class="value ${profit >= 0 ? 'profit' : 'loss'}">${fmtMoney(profit)}<em> zł</em></div>
+      <div class="sub">marża ${allRev ? ((profit/allRev)*100).toFixed(1) : 0}%</div>
+    </div>
+    <div class="stat-cell">
+      <div class="label">Średnio dziennie</div>
+      <div class="value">${fmtMoney(avgDay)}<em> zł</em></div>
+      <div class="sub">średni utarg</div>
+    </div>
+  `;
+
+  drawWeeklyChart();
+  drawMonthlyChart();
+  drawFishChart();
+}
+
+function drawWeeklyChart() {
+  const ctx = document.getElementById('weeklyChart');
+  if (!ctx) return;
+  if (charts.weekly) charts.weekly.destroy();
+
+  const weeks = [];
+  const start = startOfWeek(new Date());
+  for (let i = 11; i >= 0; i--) {
+    const ws = addDays(start, -i * 7);
+    let total = 0;
+    for (let d = 0; d < 7; d++) {
+      const k = fmtDate(addDays(ws, d));
+      total += (state.revenues[k] && state.revenues[k].amount) || 0;
+    }
+    const wk = getWeekKey(ws);
+    const cost = (state.orders[wk] || []).reduce((s, o) => s + (o.cost||0), 0);
+    weeks.push({ label: 'T' + wk.split('-W')[1], rev: total, cost });
+  }
+
+  charts.weekly = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: weeks.map(w => w.label),
+      datasets: [
+        {
+          label: 'Utarg',
+          data: weeks.map(w => w.rev),
+          backgroundColor: 'rgba(201, 138, 75, .85)',
+          borderColor: '#c98a4b',
+          borderWidth: 0,
+        },
+        {
+          label: 'Koszt ryb',
+          data: weeks.map(w => w.cost),
+          backgroundColor: 'rgba(74, 157, 156, .7)',
+          borderColor: '#4a9d9c',
+          borderWidth: 0,
+        }
+      ]
+    },
+    options: chartOpts(),
+  });
+}
+
+function drawMonthlyChart() {
+  const ctx = document.getElementById('monthlyChart');
+  if (!ctx) return;
+  if (charts.monthly) charts.monthly.destroy();
+
+  const yr = new Date().getFullYear();
+  const months = Array.from({length: 12}, (_, i) => ({ rev: 0, cost: 0 }));
+
+  Object.entries(state.revenues).forEach(([k, v]) => {
+    const d = new Date(k);
+    if (d.getFullYear() === yr) months[d.getMonth()].rev += v.amount || 0;
+  });
+  Object.entries(state.orders).forEach(([wk, orders]) => {
+    // przybliż datę = pierwszy dzień danego tygodnia
+    const yrPart = parseInt(wk.split('-W')[0]);
+    const wkNum = parseInt(wk.split('-W')[1]);
+    if (yrPart !== yr) return;
+    // mid-week date
+    const jan4 = new Date(yrPart, 0, 4);
+    const jan4Day = (jan4.getDay() + 6) % 7;
+    const monStart = addDays(jan4, -jan4Day + (wkNum-1)*7);
+    const mid = addDays(monStart, 3);
+    if (mid.getFullYear() !== yr) return;
+    const cost = orders.reduce((s, o) => s + (o.cost||0), 0);
+    months[mid.getMonth()].cost += cost;
+  });
+
+  charts.monthly = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: monthNames.map(m => m.slice(0,3)),
+      datasets: [
+        {
+          label: 'Utarg',
+          data: months.map(m => m.rev),
+          borderColor: '#c98a4b',
+          backgroundColor: 'rgba(201, 138, 75, .15)',
+          tension: .3,
+          fill: true,
+          pointRadius: 4,
+          pointBackgroundColor: '#c98a4b',
+        },
+        {
+          label: 'Koszty',
+          data: months.map(m => m.cost),
+          borderColor: '#4a9d9c',
+          backgroundColor: 'rgba(74, 157, 156, .1)',
+          tension: .3,
+          fill: true,
+          pointRadius: 4,
+          pointBackgroundColor: '#4a9d9c',
+        }
+      ]
+    },
+    options: chartOpts(),
+  });
+}
+
+function drawFishChart() {
+  const ctx = document.getElementById('fishChart');
+  if (!ctx) return;
+  if (charts.fish) charts.fish.destroy();
+
+  const totals = {};
+  Object.values(state.orders).flat().forEach(o => {
+    totals[o.fishId] = (totals[o.fishId] || 0) + (o.kg || 0);
+  });
+
+  const labels = [];
+  const data = [];
+  Object.entries(totals).forEach(([id, kg]) => {
+    const f = state.fishTypes.find(x => x.id === id);
+    labels.push(f ? f.name : '—');
+    data.push(kg);
+  });
+
+  if (labels.length === 0) {
+    labels.push('Brak danych');
+    data.push(0);
+  }
+
+  const colors = ['#c98a4b','#4a9d9c','#d4b896','#7ea05c','#c8553d','#9aa6a8','#a07b4f','#5a8a89'];
+
+  charts.fish = new Chart(ctx, {
+    type: 'doughnut',
+    data: {
+      labels,
+      datasets: [{
+        data,
+        backgroundColor: labels.map((_, i) => colors[i % colors.length]),
+        borderColor: '#161e22',
+        borderWidth: 2,
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          position: 'right',
+          labels: {
+            color: '#e8e2d4',
+            font: { family: 'JetBrains Mono', size: 11 }
+          }
+        }
+      }
+    }
+  });
+}
+
+function chartOpts() {
+  return {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: {
+        labels: {
+          color: '#e8e2d4',
+          font: { family: 'JetBrains Mono', size: 11 }
+        }
+      }
+    },
+    scales: {
+      x: {
+        grid: { color: 'rgba(42,57,64,.5)' },
+        ticks: { color: '#9aa6a8', font: { family: 'JetBrains Mono', size: 10 } }
+      },
+      y: {
+        grid: { color: 'rgba(42,57,64,.5)' },
+        ticks: { color: '#9aa6a8', font: { family: 'JetBrains Mono', size: 10 } }
+      }
+    }
+  };
+}
+
+/* =========================================================
+   PANEL: ROK
+   ========================================================= */
+function renderYear() {
+  // wybór roku
+  const years = new Set();
+  Object.keys(state.revenues).forEach(k => years.add(parseInt(k.split('-')[0])));
+  Object.keys(state.orders).forEach(k => years.add(parseInt(k.split('-W')[0])));
+  if (years.size === 0) years.add(new Date().getFullYear());
+
+  const sortedYears = Array.from(years).sort((a, b) => b - a);
+  if (!sortedYears.includes(currentYear)) currentYear = sortedYears[0];
+
+  const ys = document.getElementById('yearSelect');
+  ys.innerHTML = sortedYears.map(y =>
+    `<button class="year-btn ${y === currentYear ? 'active' : ''}" onclick="selectYear(${y})">${y}</button>`
+  ).join('');
+
+  // staty rok
+  let totalRev = 0, totalCost = 0, totalKg = 0;
+  Object.entries(state.revenues).forEach(([k, v]) => {
+    if (k.startsWith(currentYear + '-')) totalRev += v.amount || 0;
+  });
+  Object.entries(state.orders).forEach(([wk, ords]) => {
+    if (wk.startsWith(currentYear + '-W')) {
+      ords.forEach(o => {
+        totalCost += o.cost || 0;
+        totalKg += o.kg || 0;
+      });
+    }
+  });
+  const profit = totalRev - totalCost;
+
+  document.getElementById('yearStatsRow').innerHTML = `
+    <div class="stat-cell">
+      <div class="label">Rok ${currentYear} — utarg</div>
+      <div class="value">${fmtMoney(totalRev)}<em> zł</em></div>
+    </div>
+    <div class="stat-cell">
+      <div class="label">Koszt ryb</div>
+      <div class="value">${fmtMoney(totalCost)}<em> zł</em></div>
+      <div class="sub">${fmtKg(totalKg)} kg</div>
+    </div>
+    <div class="stat-cell">
+      <div class="label">Zysk roczny</div>
+      <div class="value ${profit >= 0 ? 'profit' : 'loss'}">${fmtMoney(profit)}<em> zł</em></div>
+      <div class="sub">marża ${totalRev ? ((profit/totalRev)*100).toFixed(1) : 0}%</div>
+    </div>
+  `;
+
+  // miesiące
+  const months = Array.from({length: 12}, () => ({ rev: 0, cost: 0 }));
+  Object.entries(state.revenues).forEach(([k, v]) => {
+    const [y, m] = k.split('-');
+    if (parseInt(y) === currentYear) months[parseInt(m)-1].rev += v.amount || 0;
+  });
+  Object.entries(state.orders).forEach(([wk, ords]) => {
+    const yrPart = parseInt(wk.split('-W')[0]);
+    const wkNum = parseInt(wk.split('-W')[1]);
+    if (yrPart !== currentYear) return;
+    const jan4 = new Date(yrPart, 0, 4);
+    const jan4Day = (jan4.getDay() + 6) % 7;
+    const monStart = addDays(jan4, -jan4Day + (wkNum-1)*7);
+    const mid = addDays(monStart, 3);
+    if (mid.getFullYear() !== currentYear) return;
+    const c = ords.reduce((s, o) => s + (o.cost||0), 0);
+    months[mid.getMonth()].cost += c;
+  });
+
+  const grid = document.getElementById('monthGrid');
+  grid.innerHTML = months.map((m, i) => {
+    const p = m.rev - m.cost;
+    return `<div class="month-card">
+      <div class="m-name">${monthNames[i]}</div>
+      <div class="m-rev">${fmtMoney(m.rev)} zł</div>
+      <div class="m-cost">koszt: ${fmtMoney(m.cost)} zł</div>
+      <div class="m-profit ${p >= 0 ? 'pos' : 'neg'}">zysk: ${fmtMoney(p)} zł</div>
+    </div>`;
+  }).join('');
+}
+
+function selectYear(y) {
+  currentYear = y;
+  renderYear();
+}
+
+/* =========================================================
+   IMPORT / EKSPORT
+   ========================================================= */
+function exportJSON() {
+  const data = JSON.stringify(state, null, 2);
+  const blob = new Blob([data], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `polow-eksport-${fmtDate(new Date())}.json`;
+  a.click();
+  URL.revokeObjectURL(url);
+  toast('Wyeksportowano JSON');
+}
+
+function importJSON(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = (ev) => {
+    try {
+      const data = JSON.parse(ev.target.result);
+      if (!data.revenues && !data.orders && !data.fishTypes) throw new Error('Nieprawidłowy format');
+      if (!confirm('Zaimportować dane? Bieżące zostaną nadpisane.')) return;
+      state = {
+        revenues: data.revenues || {},
+        orders: data.orders || {},
+        fishTypes: data.fishTypes || [],
+      };
+      save();
+      renderWeek();
+      renderFishTypes();
+      toast('Zaimportowano dane');
+    } catch (err) {
+      toast('Błąd importu: ' + err.message, true);
+    }
+  };
+  reader.readAsText(file);
+  e.target.value = '';
+}
+
+/* =========================================================
+   STARTUP
+   ========================================================= */
+load();
+renderWeek();
+
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') closeDayModal();
+  if (e.key === 'Enter' && document.getElementById('dayModal').classList.contains('show')) {
+    if (e.target.tagName !== 'TEXTAREA') saveDay();
+  }
+});
+</script>
+</body>
+</html>
