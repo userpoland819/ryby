@@ -10,19 +10,21 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
 <style>
   :root {
-    --bg: #0f1518;
-    --bg-2: #161e22;
-    --bg-3: #1d272c;
-    --line: #2a3940;
-    --ink: #e8e2d4;
-    --ink-dim: #9aa6a8;
-    --ink-faint: #5a6669;
-    --accent: #c98a4b;     /* miedź / mosiądz */
-    --accent-2: #4a9d9c;   /* patyna / morska zieleń */
-    --accent-3: #d4b896;   /* piasek */
-    --danger: #c8553d;
-    --good: #7ea05c;
-    --shadow: 0 20px 50px rgba(0,0,0,.4);
+    --bg: #f7f4ee;
+    --bg-2: #ffffff;
+    --bg-3: #f0ece3;
+    --line: #e3ddd0;
+    --line-soft: #efe9dc;
+    --ink: #1f2426;
+    --ink-dim: #6b7378;
+    --ink-faint: #a8aeb1;
+    --accent: #b06b2e;
+    --accent-2: #2f7c7a;
+    --accent-3: #c89968;
+    --danger: #b13a26;
+    --good: #4f7c3a;
+    --shadow: 0 4px 16px rgba(50, 40, 20, .06);
+    --shadow-lg: 0 12px 40px rgba(50, 40, 20, .1);
   }
 
   * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -41,8 +43,8 @@
     position: fixed;
     inset: 0;
     background:
-      radial-gradient(circle at 15% 20%, rgba(74, 157, 156, .08), transparent 50%),
-      radial-gradient(circle at 85% 70%, rgba(201, 138, 75, .06), transparent 55%);
+      radial-gradient(circle at 12% 18%, rgba(47, 124, 122, .05), transparent 50%),
+      radial-gradient(circle at 88% 75%, rgba(176, 107, 46, .045), transparent 55%);
     pointer-events: none;
     z-index: 0;
   }
@@ -52,10 +54,10 @@
     position: fixed;
     inset: 0;
     background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' /%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.5'/%3E%3C/svg%3E");
-    opacity: .04;
+    opacity: .025;
     pointer-events: none;
     z-index: 0;
-    mix-blend-mode: overlay;
+    mix-blend-mode: multiply;
   }
 
   .app {
@@ -66,7 +68,6 @@
     padding: 32px 28px 80px;
   }
 
-  /* ===== HEADER ===== */
   header.masthead {
     border-bottom: 1px solid var(--line);
     padding-bottom: 24px;
@@ -77,12 +78,7 @@
     align-items: end;
   }
 
-  .brand {
-    display: flex;
-    align-items: baseline;
-    gap: 14px;
-  }
-
+  .brand { display: flex; align-items: baseline; gap: 14px; }
   .brand .logo-mark {
     font-family: 'Fraunces', serif;
     font-style: italic;
@@ -92,7 +88,6 @@
     color: var(--accent);
     letter-spacing: -.02em;
   }
-
   .brand h1 {
     font-family: 'Fraunces', serif;
     font-weight: 600;
@@ -100,12 +95,7 @@
     letter-spacing: -.03em;
     line-height: 1;
   }
-  .brand h1 em {
-    font-style: italic;
-    font-weight: 300;
-    color: var(--accent-3);
-  }
-
+  .brand h1 em { font-style: italic; font-weight: 300; color: var(--accent); }
   .brand .tag {
     font-family: 'JetBrains Mono', monospace;
     font-size: 10px;
@@ -116,14 +106,10 @@
     display: block;
   }
 
-  .toolbar {
-    display: flex;
-    gap: 8px;
-    flex-wrap: wrap;
-  }
+  .toolbar { display: flex; gap: 8px; flex-wrap: wrap; }
 
   .btn {
-    background: transparent;
+    background: var(--bg-2);
     color: var(--ink);
     border: 1px solid var(--line);
     padding: 10px 16px;
@@ -136,15 +122,14 @@
     border-radius: 0;
   }
   .btn:hover { background: var(--bg-3); border-color: var(--accent); color: var(--accent); }
-  .btn.primary { background: var(--accent); color: var(--bg); border-color: var(--accent); }
-  .btn.primary:hover { background: var(--accent-3); border-color: var(--accent-3); color: var(--bg); }
-  .btn.ghost-acc { color: var(--accent-2); border-color: var(--accent-2); }
-  .btn.ghost-acc:hover { background: var(--accent-2); color: var(--bg); }
+  .btn.primary { background: var(--accent); color: #fff; border-color: var(--accent); }
+  .btn.primary:hover { background: #95591e; border-color: #95591e; color: #fff; }
+  .btn.ghost-acc { color: var(--accent-2); border-color: var(--accent-2); background: var(--bg-2); }
+  .btn.ghost-acc:hover { background: var(--accent-2); color: #fff; }
   .btn.small { padding: 6px 12px; font-size: 10px; }
-  .btn.danger { color: var(--danger); border-color: var(--danger); }
-  .btn.danger:hover { background: var(--danger); color: var(--bg); }
+  .btn.danger { color: var(--danger); border-color: var(--danger); background: var(--bg-2); }
+  .btn.danger:hover { background: var(--danger); color: #fff; }
 
-  /* ===== TABS ===== */
   .tabs {
     display: flex;
     gap: 0;
@@ -175,14 +160,9 @@
     height: 2px;
     background: var(--accent);
   }
-  .tab .num {
-    color: var(--ink-faint);
-    margin-right: 8px;
-    font-weight: 300;
-  }
+  .tab .num { color: var(--ink-faint); margin-right: 8px; font-weight: 300; }
   .tab.active .num { color: var(--accent); }
 
-  /* ===== PANELS ===== */
   .panel { display: none; animation: fade .4s ease; }
   .panel.active { display: block; }
   @keyframes fade {
@@ -190,7 +170,6 @@
     to { opacity: 1; transform: translateY(0); }
   }
 
-  /* ===== CALENDAR / DAY GRID ===== */
   .week-nav {
     display: flex;
     align-items: center;
@@ -205,11 +184,11 @@
     font-size: 28px;
     letter-spacing: -.02em;
   }
-  .week-nav h2 em { font-style: italic; color: var(--accent-3); font-weight: 300; }
+  .week-nav h2 em { font-style: italic; color: var(--accent); font-weight: 300; }
   .week-nav .nav-buttons { display: flex; gap: 6px; }
   .nav-btn {
     width: 36px; height: 36px;
-    background: transparent;
+    background: var(--bg-2);
     border: 1px solid var(--line);
     color: var(--ink);
     cursor: pointer;
@@ -217,7 +196,7 @@
     font-size: 18px;
     transition: all .2s;
   }
-  .nav-btn:hover { background: var(--accent); color: var(--bg); border-color: var(--accent); }
+  .nav-btn:hover { background: var(--accent); color: #fff; border-color: var(--accent); }
 
   .week-grid {
     display: grid;
@@ -225,6 +204,7 @@
     gap: 1px;
     background: var(--line);
     border: 1px solid var(--line);
+    box-shadow: var(--shadow);
   }
 
   .day-card {
@@ -239,9 +219,7 @@
     justify-content: space-between;
   }
   .day-card:hover { background: var(--bg-3); }
-  .day-card.today {
-    background: linear-gradient(135deg, var(--bg-2) 60%, rgba(201, 138, 75, .08));
-  }
+  .day-card.today { background: linear-gradient(135deg, var(--bg-2) 60%, rgba(176, 107, 46, .08)); }
   .day-card.today::before {
     content: "";
     position: absolute;
@@ -249,9 +227,7 @@
     width: 3px; height: 100%;
     background: var(--accent);
   }
-  .day-card.has-data {
-    border-bottom: 2px solid var(--accent-2);
-  }
+  .day-card.has-data { border-bottom: 2px solid var(--accent-2); }
 
   .day-head { display: flex; justify-content: space-between; align-items: baseline; }
   .day-name {
@@ -278,13 +254,8 @@
     margin-top: 8px;
   }
   .day-amount.empty { color: var(--ink-faint); font-weight: 300; }
-  .day-amount .cur {
-    font-size: 10px;
-    color: var(--ink-faint);
-    margin-left: 2px;
-  }
+  .day-amount .cur { font-size: 10px; color: var(--ink-faint); margin-left: 2px; }
 
-  /* ===== STATS ROW ===== */
   .stats-row {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -292,11 +263,9 @@
     background: var(--line);
     border: 1px solid var(--line);
     margin-top: 32px;
+    box-shadow: var(--shadow);
   }
-  .stat-cell {
-    background: var(--bg-2);
-    padding: 22px 20px;
-  }
+  .stat-cell { background: var(--bg-2); padding: 22px 20px; }
   .stat-cell .label {
     font-family: 'JetBrains Mono', monospace;
     font-size: 10px;
@@ -312,9 +281,11 @@
     letter-spacing: -.02em;
     color: var(--ink);
   }
-  .stat-cell .value em { font-style: italic; font-weight: 300; color: var(--accent-3); }
+  .stat-cell .value em { font-style: italic; font-weight: 300; color: var(--accent); }
   .stat-cell .value.profit { color: var(--good); }
+  .stat-cell .value.profit em { color: var(--good); opacity: .7; }
   .stat-cell .value.loss { color: var(--danger); }
+  .stat-cell .value.loss em { color: var(--danger); opacity: .7; }
   .stat-cell .sub {
     font-family: 'JetBrains Mono', monospace;
     font-size: 11px;
@@ -322,11 +293,10 @@
     margin-top: 4px;
   }
 
-  /* ===== MODAL ===== */
   .modal-bg {
     position: fixed;
     inset: 0;
-    background: rgba(8, 12, 14, .82);
+    background: rgba(31, 36, 38, .35);
     backdrop-filter: blur(6px);
     display: none;
     align-items: center;
@@ -343,7 +313,7 @@
     max-width: 540px;
     max-height: 90vh;
     overflow-y: auto;
-    box-shadow: var(--shadow);
+    box-shadow: var(--shadow-lg);
     animation: slideUp .3s ease;
   }
   @keyframes slideUp {
@@ -363,7 +333,7 @@
     font-size: 26px;
     letter-spacing: -.02em;
   }
-  .modal-head h3 em { font-style: italic; color: var(--accent-3); font-weight: 300; }
+  .modal-head h3 em { font-style: italic; color: var(--accent); font-weight: 300; }
   .close-btn {
     background: transparent;
     border: 0;
@@ -382,9 +352,9 @@
     display: flex;
     gap: 8px;
     justify-content: flex-end;
+    background: var(--bg);
   }
 
-  /* ===== FORMS ===== */
   label.field {
     display: block;
     font-family: 'JetBrains Mono', monospace;
@@ -399,7 +369,7 @@
 
   input[type="text"], input[type="number"], input[type="date"], select, textarea {
     width: 100%;
-    background: var(--bg);
+    background: var(--bg-2);
     border: 1px solid var(--line);
     color: var(--ink);
     padding: 12px 14px;
@@ -407,10 +377,7 @@
     font-size: 14px;
     transition: border-color .2s;
   }
-  input:focus, select:focus, textarea:focus {
-    outline: none;
-    border-color: var(--accent);
-  }
+  input:focus, select:focus, textarea:focus { outline: none; border-color: var(--accent); }
   input[type="number"] {
     font-family: 'Fraunces', serif;
     font-size: 22px;
@@ -418,7 +385,6 @@
     letter-spacing: -.01em;
   }
 
-  /* ===== FISH PANEL ===== */
   .section-title {
     font-family: 'Fraunces', serif;
     font-weight: 400;
@@ -426,7 +392,7 @@
     letter-spacing: -.02em;
     margin-bottom: 4px;
   }
-  .section-title em { font-style: italic; color: var(--accent-3); font-weight: 300; }
+  .section-title em { font-style: italic; color: var(--accent); font-weight: 300; }
   .section-sub {
     font-family: 'JetBrains Mono', monospace;
     font-size: 11px;
@@ -449,14 +415,22 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    transition: border-color .2s;
+    transition: all .2s;
+    box-shadow: var(--shadow);
   }
   .fish-chip:hover { border-color: var(--accent-2); }
+  .fish-chip .info { display: flex; flex-direction: column; gap: 2px; }
   .fish-chip .name {
     font-family: 'Fraunces', serif;
     font-style: italic;
     font-size: 18px;
     color: var(--ink);
+  }
+  .fish-chip .last-price {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    color: var(--ink-faint);
+    letter-spacing: .1em;
   }
   .fish-chip .remove {
     background: transparent;
@@ -475,27 +449,97 @@
   }
   .add-fish-form input { flex: 1; }
 
-  .order-row {
+  .order-input-row {
     display: grid;
-    grid-template-columns: 2fr 1fr 1fr auto;
+    grid-template-columns: 1.5fr 1fr 1fr 1fr;
     gap: 8px;
     align-items: center;
-    margin-bottom: 8px;
+    padding: 12px 14px;
+    border-bottom: 1px solid var(--line-soft);
+    transition: background .15s;
   }
-  .order-row select, .order-row input { font-size: 13px; padding: 10px 12px; }
+  .order-input-row:last-child { border-bottom: 0; }
+  .order-input-row:hover { background: var(--bg); }
+  .order-input-row.filled { background: rgba(176, 107, 46, .04); }
+
+  .order-input-row .fish-label {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-size: 17px;
+    color: var(--ink);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .order-input-row .fish-label .last-hint {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    color: var(--ink-faint);
+    font-style: normal;
+    letter-spacing: .08em;
+  }
+
+  .order-input-row input { padding: 10px 12px; font-size: 16px; }
+  .order-input-row .total {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 14px;
+    color: var(--accent);
+    font-weight: 500;
+    text-align: right;
+    padding: 0 8px;
+  }
+  .order-input-row .total.zero { color: var(--ink-faint); font-weight: 300; }
+
+  .orders-table-head {
+    display: grid;
+    grid-template-columns: 1.5fr 1fr 1fr 1fr;
+    gap: 8px;
+    padding: 10px 14px;
+    background: var(--bg);
+    border-bottom: 1px solid var(--line);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    letter-spacing: .2em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+  }
+  .orders-table-head .right { text-align: right; }
+
+  .orders-summary-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: var(--bg);
+    padding: 14px 18px;
+    border-top: 1px solid var(--line);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+  }
+  .orders-summary-bar .label {
+    color: var(--ink-dim);
+    letter-spacing: .15em;
+    text-transform: uppercase;
+    font-size: 10px;
+  }
+  .orders-summary-bar .total-val {
+    font-family: 'Fraunces', serif;
+    font-size: 22px;
+    color: var(--accent);
+    font-weight: 500;
+    letter-spacing: -.01em;
+  }
 
   .order-list {
     background: var(--bg-2);
     border: 1px solid var(--line);
-    padding: 4px;
     margin-bottom: 16px;
   }
   .order-item {
     display: grid;
-    grid-template-columns: 2fr 1fr 1fr auto;
+    grid-template-columns: 2fr 1fr 1fr 1fr;
     gap: 12px;
     padding: 12px 16px;
-    border-bottom: 1px solid var(--line);
+    border-bottom: 1px solid var(--line-soft);
     align-items: center;
   }
   .order-item:last-child { border-bottom: 0; }
@@ -508,31 +552,22 @@
     font-family: 'JetBrains Mono', monospace;
     font-size: 13px;
     color: var(--ink-dim);
+    text-align: right;
   }
-  .order-item .o-num.acc { color: var(--accent); }
-  .remove-order {
-    background: transparent;
-    border: 0;
-    color: var(--ink-faint);
-    cursor: pointer;
-    font-size: 16px;
-  }
-  .remove-order:hover { color: var(--danger); }
+  .order-item .o-num.acc { color: var(--accent); font-weight: 500; }
 
-  /* ===== ORDERS BY WEEK ===== */
   .week-orders-card {
     background: var(--bg-2);
     border: 1px solid var(--line);
-    padding: 24px;
     margin-bottom: 24px;
+    box-shadow: var(--shadow);
   }
+  .week-orders-card .card-pad { padding: 24px 28px; }
   .week-orders-head {
     display: flex;
     justify-content: space-between;
     align-items: baseline;
-    margin-bottom: 16px;
-    padding-bottom: 12px;
-    border-bottom: 1px solid var(--line);
+    margin-bottom: 4px;
   }
   .week-orders-head h4 {
     font-family: 'Fraunces', serif;
@@ -540,20 +575,28 @@
     font-size: 22px;
     letter-spacing: -.01em;
   }
-  .week-orders-head h4 em { font-style: italic; color: var(--accent-3); }
+  .week-orders-head h4 em { font-style: italic; color: var(--accent); }
   .week-orders-head .total {
     font-family: 'JetBrains Mono', monospace;
     font-size: 16px;
     color: var(--accent);
     font-weight: 500;
   }
+  .week-orders-card .help {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    color: var(--ink-faint);
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    margin-bottom: 18px;
+  }
 
-  /* ===== CHARTS ===== */
   .chart-card {
     background: var(--bg-2);
     border: 1px solid var(--line);
     padding: 24px;
     margin-bottom: 24px;
+    box-shadow: var(--shadow);
   }
   .chart-card h4 {
     font-family: 'Fraunces', serif;
@@ -562,7 +605,7 @@
     margin-bottom: 4px;
     letter-spacing: -.01em;
   }
-  .chart-card h4 em { font-style: italic; color: var(--accent-3); }
+  .chart-card h4 em { font-style: italic; color: var(--accent); }
   .chart-card .chart-sub {
     font-family: 'JetBrains Mono', monospace;
     font-size: 10px;
@@ -571,10 +614,7 @@
     color: var(--ink-faint);
     margin-bottom: 18px;
   }
-  .chart-wrap {
-    position: relative;
-    height: 280px;
-  }
+  .chart-wrap { position: relative; height: 280px; }
 
   .empty-state {
     text-align: center;
@@ -586,7 +626,7 @@
     font-style: italic;
     font-size: 60px;
     color: var(--accent);
-    opacity: .3;
+    opacity: .35;
     margin-bottom: 16px;
   }
   .empty-state p {
@@ -595,28 +635,26 @@
     font-size: 18px;
   }
 
-  /* ===== TOAST ===== */
   .toast {
     position: fixed;
     bottom: 24px;
     left: 50%;
     transform: translateX(-50%) translateY(100px);
-    background: var(--bg-3);
+    background: var(--ink);
     border: 1px solid var(--accent);
-    color: var(--ink);
+    color: #fff;
     padding: 14px 24px;
     font-family: 'JetBrains Mono', monospace;
     font-size: 12px;
     letter-spacing: .12em;
     text-transform: uppercase;
-    box-shadow: var(--shadow);
+    box-shadow: var(--shadow-lg);
     z-index: 200;
     transition: transform .35s cubic-bezier(.2, .9, .3, 1.2);
   }
   .toast.show { transform: translateX(-50%) translateY(0); }
   .toast.danger { border-color: var(--danger); }
 
-  /* ===== YEAR / MONTH SUMMARIES ===== */
   .month-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
@@ -627,7 +665,8 @@
     background: var(--bg-2);
     border: 1px solid var(--line);
     padding: 18px;
-    transition: border-color .2s;
+    transition: all .2s;
+    box-shadow: var(--shadow);
   }
   .month-card:hover { border-color: var(--accent); }
   .month-card .m-name {
@@ -666,6 +705,7 @@
     border: 1px solid var(--line);
     padding: 4px;
     margin-bottom: 24px;
+    box-shadow: var(--shadow);
   }
   .year-btn {
     background: transparent;
@@ -677,7 +717,7 @@
     cursor: pointer;
     transition: all .2s;
   }
-  .year-btn.active { background: var(--accent); color: var(--bg); }
+  .year-btn.active { background: var(--accent); color: #fff; }
 
   hr.fancy {
     border: 0;
@@ -691,13 +731,14 @@
     header.masthead { grid-template-columns: 1fr; }
     .brand .logo-mark { font-size: 42px; }
     .brand h1 { font-size: 28px; }
-    .week-grid {
-      grid-template-columns: 1fr 1fr;
-    }
+    .week-grid { grid-template-columns: 1fr 1fr; }
     .day-card { min-height: 100px; }
-    .order-row, .order-item {
+    .order-input-row, .order-item, .orders-table-head {
       grid-template-columns: 1fr 1fr;
+      gap: 6px;
     }
+    .order-input-row .fish-label { grid-column: 1 / -1; font-size: 16px; }
+    .orders-table-head { display: none; }
   }
 </style>
 </head>
@@ -705,7 +746,6 @@
 
 <div class="app">
 
-  <!-- HEADER -->
   <header class="masthead">
     <div class="brand">
       <span class="logo-mark">~</span>
@@ -721,7 +761,6 @@
     </div>
   </header>
 
-  <!-- TABS -->
   <nav class="tabs">
     <button class="tab active" data-tab="daily"><span class="num">01</span>Tydzień</button>
     <button class="tab" data-tab="orders"><span class="num">02</span>Zamówienia</button>
@@ -730,7 +769,6 @@
     <button class="tab" data-tab="year"><span class="num">05</span>Rok</button>
   </nav>
 
-  <!-- ===== PANEL: DAILY ===== -->
   <section class="panel active" id="panel-daily">
     <div class="week-nav">
       <h2 id="weekTitle">Tydzień <em>—</em></h2>
@@ -746,10 +784,9 @@
     <div class="stats-row" id="weekStatsRow"></div>
   </section>
 
-  <!-- ===== PANEL: ORDERS ===== -->
   <section class="panel" id="panel-orders">
     <h2 class="section-title">Zamówienia <em>ryb</em></h2>
-    <p class="section-sub">Zarejestrowane w bieżącym tygodniu &amp; archiwum</p>
+    <p class="section-sub">Wpisuj ile kg każdej ryby i cenę za kg brutto</p>
 
     <div class="week-nav">
       <h2 id="ordersWeekTitle" style="font-size: 22px;">Tydzień <em>—</em></h2>
@@ -761,23 +798,38 @@
     </div>
 
     <div class="week-orders-card">
-      <div class="week-orders-head">
-        <h4>Dodaj <em>zamówienie</em></h4>
+      <div class="card-pad">
+        <div class="week-orders-head">
+          <h4>Zamówienie <em>tygodnia</em></h4>
+        </div>
+        <div class="help">Pozostaw 0 kg jeśli danej ryby nie zamawiasz</div>
+      </div>
+
+      <div class="orders-table-head">
+        <span>Gatunek</span>
+        <span>Kg</span>
+        <span>Cena / kg brutto</span>
+        <span class="right">Wartość</span>
       </div>
 
       <div id="orderRows"></div>
 
-      <button class="btn small" onclick="addOrderRow()">+ Dodaj rybę</button>
-      <button class="btn primary small" style="margin-left: 8px;" onclick="saveOrders()">Zapisz tydzień</button>
+      <div class="orders-summary-bar">
+        <span class="label">Razem do zapłaty</span>
+        <span class="total-val" id="orderTotal">0,00 zł</span>
+      </div>
+
+      <div style="padding: 16px 28px; display:flex; gap:8px; justify-content:flex-end; background: var(--bg); border-top: 1px solid var(--line);">
+        <button class="btn primary" onclick="saveOrders()">Zapisz zamówienie</button>
+      </div>
     </div>
 
     <div id="ordersHistory"></div>
   </section>
 
-  <!-- ===== PANEL: FISH ===== -->
   <section class="panel" id="panel-fish">
     <h2 class="section-title">Gatunki <em>ryb</em></h2>
-    <p class="section-sub">Słownik dostępnych gatunków</p>
+    <p class="section-sub">Słownik dostępnych gatunków &amp; ostatnia cena</p>
 
     <div class="add-fish-form">
       <input type="text" id="newFishName" placeholder="np. Łosoś atlantycki, Dorsz, Pstrąg...">
@@ -787,7 +839,6 @@
     <div class="fish-types-grid" id="fishTypesGrid"></div>
   </section>
 
-  <!-- ===== PANEL: STATS ===== -->
   <section class="panel" id="panel-stats">
     <h2 class="section-title">Statystyki <em>i wykresy</em></h2>
     <p class="section-sub">Analiza tygodniowa, miesięczna, podsumowania kosztów</p>
@@ -815,7 +866,6 @@
     </div>
   </section>
 
-  <!-- ===== PANEL: YEAR ===== -->
   <section class="panel" id="panel-year">
     <h2 class="section-title">Podsumowanie <em>roczne</em></h2>
     <p class="section-sub">Miesiąc po miesiącu</p>
@@ -831,7 +881,6 @@
 
 </div>
 
-<!-- ===== DAY MODAL ===== -->
 <div class="modal-bg" id="dayModal">
   <div class="modal">
     <div class="modal-head">
@@ -856,15 +905,12 @@
 <div class="toast" id="toast">Zapisano</div>
 
 <script>
-/* =========================================================
-   STAN APLIKACJI
-   ========================================================= */
-const STORAGE_KEY = 'polow_v1';
+const STORAGE_KEY = 'polow_v2';
 
 let state = {
-  revenues: {},     // { 'YYYY-MM-DD': { amount: number, note: string } }
-  fishTypes: [],    // [{ id, name }]
-  orders: {},       // { 'YYYY-WW': [{ fishId, kg, cost }, ...] }
+  revenues: {},
+  fishTypes: [],
+  orders: {},
 };
 
 let currentWeekStart = startOfWeek(new Date());
@@ -873,35 +919,55 @@ let editingDay = null;
 let currentYear = new Date().getFullYear();
 let charts = {};
 
-/* =========================================================
-   STORAGE
-   ========================================================= */
 function load() {
   try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if (raw) {
-      const parsed = JSON.parse(raw);
+    const oldRaw = localStorage.getItem('polow_v1');
+    const newRaw = localStorage.getItem(STORAGE_KEY);
+
+    if (newRaw) {
+      const parsed = JSON.parse(newRaw);
       state = Object.assign(state, parsed);
+    } else if (oldRaw) {
+      const old = JSON.parse(oldRaw);
+      state.revenues = old.revenues || {};
+      state.fishTypes = (old.fishTypes || []).map(f => ({ ...f, lastPrice: 0 }));
+      state.orders = {};
+      Object.entries(old.orders || {}).forEach(([wk, ords]) => {
+        state.orders[wk] = ords.map(o => ({
+          fishId: o.fishId,
+          kg: o.kg || 0,
+          pricePerKg: (o.kg && o.cost) ? (o.cost / o.kg) : 0
+        }));
+      });
+      const sortedWks = Object.keys(state.orders).sort();
+      sortedWks.forEach(wk => {
+        state.orders[wk].forEach(o => {
+          const f = state.fishTypes.find(x => x.id === o.fishId);
+          if (f && o.pricePerKg > 0) f.lastPrice = o.pricePerKg;
+        });
+      });
+      save();
     }
   } catch(e) { console.warn('Load error', e); }
 
-  // domyślne ryby przy pierwszym uruchomieniu
   if (!state.fishTypes || state.fishTypes.length === 0) {
     state.fishTypes = [
-      { id: uid(), name: 'Łosoś' },
-      { id: uid(), name: 'Dorsz' },
-      { id: uid(), name: 'Pstrąg' },
+      { id: uid(), name: 'Łosoś', lastPrice: 0 },
+      { id: uid(), name: 'Dorsz', lastPrice: 0 },
+      { id: uid(), name: 'Pstrąg', lastPrice: 0 },
     ];
     save();
+  } else {
+    state.fishTypes.forEach(f => {
+      if (typeof f.lastPrice !== 'number') f.lastPrice = 0;
+    });
   }
 }
+
 function save() {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
 }
 
-/* =========================================================
-   POMOCNICZE
-   ========================================================= */
 function uid() {
   return Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
 }
@@ -916,7 +982,7 @@ function startOfWeek(d) {
   const date = new Date(d);
   date.setHours(0,0,0,0);
   const day = date.getDay();
-  const diff = (day === 0 ? -6 : 1 - day); // poniedziałek = start
+  const diff = (day === 0 ? -6 : 1 - day);
   date.setDate(date.getDate() + diff);
   return date;
 }
@@ -928,7 +994,6 @@ function addDays(d, n) {
 }
 
 function getWeekKey(d) {
-  // ISO week
   const date = new Date(d.valueOf());
   date.setHours(0,0,0,0);
   date.setDate(date.getDate() + 3 - (date.getDay() + 6) % 7);
@@ -967,9 +1032,10 @@ function toast(msg, danger=false) {
   setTimeout(() => t.classList.remove('show'), 2200);
 }
 
-/* =========================================================
-   TABS
-   ========================================================= */
+function escapeHtml(s) {
+  return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
 document.querySelectorAll('.tab').forEach(t => {
   t.addEventListener('click', () => {
     document.querySelectorAll('.tab').forEach(x => x.classList.remove('active'));
@@ -985,9 +1051,6 @@ document.querySelectorAll('.tab').forEach(t => {
   });
 });
 
-/* =========================================================
-   PANEL: TYDZIEŃ
-   ========================================================= */
 function changeWeek(dir) {
   if (dir === 0) currentWeekStart = startOfWeek(new Date());
   else currentWeekStart = addDays(currentWeekStart, dir * 7);
@@ -1045,11 +1108,9 @@ function renderWeekStats() {
   }
 
   const avg = count ? total / count : 0;
-
-  // koszty z zamówień tego tygodnia
   const wk = getWeekKey(currentWeekStart);
   const orders = state.orders[wk] || [];
-  const cost = orders.reduce((s, o) => s + (o.cost || 0), 0);
+  const cost = orders.reduce((s, o) => s + ((o.kg || 0) * (o.pricePerKg || 0)), 0);
   const profit = total - cost;
 
   row.innerHTML = `
@@ -1066,7 +1127,7 @@ function renderWeekStats() {
     <div class="stat-cell">
       <div class="label">Koszt ryb</div>
       <div class="value">${fmtMoney(cost)}<em> zł</em></div>
-      <div class="sub">${orders.length} pozycji</div>
+      <div class="sub">${orders.filter(o => o.kg > 0).length} pozycji</div>
     </div>
     <div class="stat-cell">
       <div class="label">Zysk netto</div>
@@ -1076,9 +1137,6 @@ function renderWeekStats() {
   `;
 }
 
-/* =========================================================
-   MODAL DNIA
-   ========================================================= */
 function openDayModal(dateKey) {
   editingDay = dateKey;
   const d = new Date(dateKey);
@@ -1136,9 +1194,6 @@ document.getElementById('dayModal').addEventListener('click', (e) => {
   if (e.target.id === 'dayModal') closeDayModal();
 });
 
-/* =========================================================
-   PANEL: RYBY
-   ========================================================= */
 function renderFishTypes() {
   const grid = document.getElementById('fishTypesGrid');
   if (state.fishTypes.length === 0) {
@@ -1147,7 +1202,10 @@ function renderFishTypes() {
   }
   grid.innerHTML = state.fishTypes.map(f => `
     <div class="fish-chip">
-      <span class="name">${escapeHtml(f.name)}</span>
+      <div class="info">
+        <span class="name">${escapeHtml(f.name)}</span>
+        <span class="last-price">${f.lastPrice > 0 ? 'OST. ' + fmtMoney(f.lastPrice) + ' zł / kg' : 'BRAK CENY'}</span>
+      </div>
       <button class="remove" onclick="removeFishType('${f.id}')" title="Usuń">×</button>
     </div>
   `).join('');
@@ -1157,7 +1215,7 @@ function addFishType() {
   const inp = document.getElementById('newFishName');
   const name = inp.value.trim();
   if (!name) { toast('Podaj nazwę', true); return; }
-  state.fishTypes.push({ id: uid(), name });
+  state.fishTypes.push({ id: uid(), name, lastPrice: 0 });
   inp.value = '';
   save();
   renderFishTypes();
@@ -1176,13 +1234,6 @@ document.getElementById('newFishName').addEventListener('keypress', (e) => {
   if (e.key === 'Enter') addFishType();
 });
 
-function escapeHtml(s) {
-  return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-}
-
-/* =========================================================
-   PANEL: ZAMÓWIENIA
-   ========================================================= */
 function changeOrdersWeek(dir) {
   if (dir === 0) ordersWeekStart = startOfWeek(new Date());
   else ordersWeekStart = addDays(ordersWeekStart, dir * 7);
@@ -1193,56 +1244,89 @@ function renderOrdersPanel() {
   document.getElementById('ordersWeekTitle').innerHTML = `Tydzień <em>${fmtWeekRange(ordersWeekStart)}</em>`;
   const wk = getWeekKey(ordersWeekStart);
   const existing = state.orders[wk] || [];
-
-  // wczytaj istniejące do formularza
   const rows = document.getElementById('orderRows');
   rows.innerHTML = '';
-  if (existing.length === 0) {
-    addOrderRow();
-  } else {
-    existing.forEach(o => addOrderRow(o));
+
+  if (state.fishTypes.length === 0) {
+    rows.innerHTML = '<div class="empty-state"><div class="icon">~</div><p>Najpierw dodaj gatunki ryb w zakładce „Ryby"</p></div>';
+    document.getElementById('orderTotal').textContent = '0,00 zł';
+    renderOrdersHistory();
+    return;
   }
 
+  state.fishTypes.forEach(f => {
+    const existingItem = existing.find(o => o.fishId === f.id);
+    const kg = existingItem ? existingItem.kg : 0;
+    const price = existingItem ? existingItem.pricePerKg : (f.lastPrice || 0);
+
+    const row = document.createElement('div');
+    row.className = 'order-input-row' + (kg > 0 ? ' filled' : '');
+    row.dataset.fishId = f.id;
+
+    row.innerHTML = `
+      <div class="fish-label">
+        <span>${escapeHtml(f.name)}</span>
+        ${f.lastPrice > 0 ? `<span class="last-hint">ost. ${fmtMoney(f.lastPrice)} zł</span>` : ''}
+      </div>
+      <input type="number" class="o-kg" step="0.01" placeholder="0" value="${kg > 0 ? kg : ''}" min="0">
+      <input type="number" class="o-price" step="0.01" placeholder="0,00" value="${price > 0 ? price : ''}" min="0">
+      <span class="total ${kg > 0 ? '' : 'zero'}">${fmtMoney((kg||0)*(price||0))} zł</span>
+    `;
+    rows.appendChild(row);
+
+    const kgInp = row.querySelector('.o-kg');
+    const priceInp = row.querySelector('.o-price');
+    [kgInp, priceInp].forEach(inp => {
+      inp.addEventListener('input', () => {
+        recalcRow(row);
+        recalcTotal();
+      });
+    });
+  });
+
+  recalcTotal();
   renderOrdersHistory();
 }
 
-function addOrderRow(data = {}) {
-  const rows = document.getElementById('orderRows');
-  const idx = rows.children.length;
-  const row = document.createElement('div');
-  row.className = 'order-row';
+function recalcRow(row) {
+  const kg = parseFloat(row.querySelector('.o-kg').value) || 0;
+  const price = parseFloat(row.querySelector('.o-price').value) || 0;
+  const totalEl = row.querySelector('.total');
+  const val = kg * price;
+  totalEl.textContent = fmtMoney(val) + ' zł';
+  totalEl.classList.toggle('zero', val === 0);
+  row.classList.toggle('filled', kg > 0);
+}
 
-  const fishOpts = state.fishTypes.map(f =>
-    `<option value="${f.id}" ${data.fishId === f.id ? 'selected' : ''}>${escapeHtml(f.name)}</option>`
-  ).join('');
-
-  row.innerHTML = `
-    <select class="o-fish">
-      <option value="">— wybierz gatunek —</option>
-      ${fishOpts}
-    </select>
-    <input type="number" class="o-kg" step="0.01" placeholder="kg" value="${data.kg || ''}">
-    <input type="number" class="o-cost" step="0.01" placeholder="koszt zł" value="${data.cost || ''}">
-    <button class="remove-order" onclick="this.parentElement.remove()">×</button>
-  `;
-  rows.appendChild(row);
+function recalcTotal() {
+  const rows = document.querySelectorAll('#orderRows .order-input-row');
+  let total = 0;
+  rows.forEach(r => {
+    const kg = parseFloat(r.querySelector('.o-kg').value) || 0;
+    const price = parseFloat(r.querySelector('.o-price').value) || 0;
+    total += kg * price;
+  });
+  document.getElementById('orderTotal').textContent = fmtMoney(total) + ' zł';
 }
 
 function saveOrders() {
   const wk = getWeekKey(ordersWeekStart);
-  const rows = document.querySelectorAll('#orderRows .order-row');
+  const rows = document.querySelectorAll('#orderRows .order-input-row');
   const orders = [];
 
   rows.forEach(r => {
-    const fishId = r.querySelector('.o-fish').value;
+    const fishId = r.dataset.fishId;
     const kg = parseFloat(r.querySelector('.o-kg').value);
-    const cost = parseFloat(r.querySelector('.o-cost').value);
+    const price = parseFloat(r.querySelector('.o-price').value);
+
     if (fishId && !isNaN(kg) && kg > 0) {
-      orders.push({
-        fishId,
-        kg,
-        cost: isNaN(cost) ? 0 : cost
-      });
+      const pricePerKg = isNaN(price) ? 0 : price;
+      orders.push({ fishId, kg, pricePerKg });
+
+      if (pricePerKg > 0) {
+        const fish = state.fishTypes.find(x => x.id === fishId);
+        if (fish) fish.lastPrice = pricePerKg;
+      }
     }
   });
 
@@ -1254,7 +1338,7 @@ function saveOrders() {
   save();
   renderOrdersPanel();
   renderWeekStats();
-  toast('Zamówienia zapisane');
+  toast(orders.length === 0 ? 'Tydzień wyczyszczony' : 'Zamówienie zapisane');
 }
 
 function renderOrdersHistory() {
@@ -1262,32 +1346,41 @@ function renderOrdersHistory() {
   const keys = Object.keys(state.orders).sort().reverse();
 
   if (keys.length === 0) {
-    cont.innerHTML = '<div class="empty-state"><div class="icon">~</div><p>Brak zamówień. Dodaj pierwsze powyżej.</p></div>';
+    cont.innerHTML = '';
     return;
   }
 
-  cont.innerHTML = '<h3 style="font-family:Fraunces,serif; font-weight:400; font-size:24px; margin: 32px 0 16px;">Archiwum <em style="font-style:italic; color:var(--accent-3);">tygodni</em></h3>';
+  cont.innerHTML = '<h3 style="font-family:Fraunces,serif; font-weight:400; font-size:24px; margin: 32px 0 16px; letter-spacing: -0.02em;">Archiwum <em style="font-style:italic; color:var(--accent);">tygodni</em></h3>';
 
   keys.slice(0, 12).forEach(wk => {
     const orders = state.orders[wk];
-    const total = orders.reduce((s, o) => s + (o.cost || 0), 0);
+    const total = orders.reduce((s, o) => s + (o.kg * o.pricePerKg || 0), 0);
     const totalKg = orders.reduce((s, o) => s + (o.kg || 0), 0);
 
     const card = document.createElement('div');
     card.className = 'week-orders-card';
     card.innerHTML = `
-      <div class="week-orders-head">
-        <h4>${wk.replace('-W', ' / tydzień ')} <em style="font-style:italic; color:var(--ink-faint); font-size:14px; margin-left:8px;">${fmtKg(totalKg)} kg</em></h4>
-        <span class="total">${fmtMoney(total)} zł</span>
+      <div class="card-pad">
+        <div class="week-orders-head">
+          <h4>${wk.replace('-W', ' / tydzień ')} <em style="font-style:italic; color:var(--ink-faint); font-size:14px; margin-left:8px;">${fmtKg(totalKg)} kg</em></h4>
+          <span class="total">${fmtMoney(total)} zł</span>
+        </div>
       </div>
-      <div class="order-list">
+      <div class="orders-table-head">
+        <span>Gatunek</span>
+        <span>Kg</span>
+        <span>Cena/kg</span>
+        <span class="right">Wartość</span>
+      </div>
+      <div class="order-list" style="margin: 0; border: 0;">
         ${orders.map(o => {
           const fish = state.fishTypes.find(f => f.id === o.fishId);
+          const total = (o.kg || 0) * (o.pricePerKg || 0);
           return `<div class="order-item">
             <span class="o-name">${fish ? escapeHtml(fish.name) : '<span style="color:var(--ink-faint)">[usunięty gatunek]</span>'}</span>
             <span class="o-num">${fmtKg(o.kg)} kg</span>
-            <span class="o-num acc">${fmtMoney(o.cost)} zł</span>
-            <span></span>
+            <span class="o-num">${fmtMoney(o.pricePerKg)} zł</span>
+            <span class="o-num acc">${fmtMoney(total)} zł</span>
           </div>`;
         }).join('')}
       </div>
@@ -1296,13 +1389,9 @@ function renderOrdersHistory() {
   });
 }
 
-/* =========================================================
-   PANEL: STATYSTYKI
-   ========================================================= */
 function renderStats() {
-  // globalne staty
   const allRev = Object.values(state.revenues).reduce((s, r) => s + (r.amount || 0), 0);
-  const allCost = Object.values(state.orders).flat().reduce((s, o) => s + (o.cost || 0), 0);
+  const allCost = Object.values(state.orders).flat().reduce((s, o) => s + (o.kg * o.pricePerKg || 0), 0);
   const allKg = Object.values(state.orders).flat().reduce((s, o) => s + (o.kg || 0), 0);
   const profit = allRev - allCost;
 
@@ -1352,7 +1441,7 @@ function drawWeeklyChart() {
       total += (state.revenues[k] && state.revenues[k].amount) || 0;
     }
     const wk = getWeekKey(ws);
-    const cost = (state.orders[wk] || []).reduce((s, o) => s + (o.cost||0), 0);
+    const cost = (state.orders[wk] || []).reduce((s, o) => s + (o.kg * o.pricePerKg || 0), 0);
     weeks.push({ label: 'T' + wk.split('-W')[1], rev: total, cost });
   }
 
@@ -1364,15 +1453,15 @@ function drawWeeklyChart() {
         {
           label: 'Utarg',
           data: weeks.map(w => w.rev),
-          backgroundColor: 'rgba(201, 138, 75, .85)',
-          borderColor: '#c98a4b',
+          backgroundColor: 'rgba(176, 107, 46, .85)',
+          borderColor: '#b06b2e',
           borderWidth: 0,
         },
         {
           label: 'Koszt ryb',
           data: weeks.map(w => w.cost),
-          backgroundColor: 'rgba(74, 157, 156, .7)',
-          borderColor: '#4a9d9c',
+          backgroundColor: 'rgba(47, 124, 122, .75)',
+          borderColor: '#2f7c7a',
           borderWidth: 0,
         }
       ]
@@ -1394,17 +1483,15 @@ function drawMonthlyChart() {
     if (d.getFullYear() === yr) months[d.getMonth()].rev += v.amount || 0;
   });
   Object.entries(state.orders).forEach(([wk, orders]) => {
-    // przybliż datę = pierwszy dzień danego tygodnia
     const yrPart = parseInt(wk.split('-W')[0]);
     const wkNum = parseInt(wk.split('-W')[1]);
     if (yrPart !== yr) return;
-    // mid-week date
     const jan4 = new Date(yrPart, 0, 4);
     const jan4Day = (jan4.getDay() + 6) % 7;
     const monStart = addDays(jan4, -jan4Day + (wkNum-1)*7);
     const mid = addDays(monStart, 3);
     if (mid.getFullYear() !== yr) return;
-    const cost = orders.reduce((s, o) => s + (o.cost||0), 0);
+    const cost = orders.reduce((s, o) => s + (o.kg * o.pricePerKg || 0), 0);
     months[mid.getMonth()].cost += cost;
   });
 
@@ -1416,22 +1503,22 @@ function drawMonthlyChart() {
         {
           label: 'Utarg',
           data: months.map(m => m.rev),
-          borderColor: '#c98a4b',
-          backgroundColor: 'rgba(201, 138, 75, .15)',
+          borderColor: '#b06b2e',
+          backgroundColor: 'rgba(176, 107, 46, .15)',
           tension: .3,
           fill: true,
           pointRadius: 4,
-          pointBackgroundColor: '#c98a4b',
+          pointBackgroundColor: '#b06b2e',
         },
         {
           label: 'Koszty',
           data: months.map(m => m.cost),
-          borderColor: '#4a9d9c',
-          backgroundColor: 'rgba(74, 157, 156, .1)',
+          borderColor: '#2f7c7a',
+          backgroundColor: 'rgba(47, 124, 122, .12)',
           tension: .3,
           fill: true,
           pointRadius: 4,
-          pointBackgroundColor: '#4a9d9c',
+          pointBackgroundColor: '#2f7c7a',
         }
       ]
     },
@@ -1462,7 +1549,7 @@ function drawFishChart() {
     data.push(0);
   }
 
-  const colors = ['#c98a4b','#4a9d9c','#d4b896','#7ea05c','#c8553d','#9aa6a8','#a07b4f','#5a8a89'];
+  const colors = ['#b06b2e','#2f7c7a','#c89968','#4f7c3a','#b13a26','#6b7378','#956245','#5a8a89'];
 
   charts.fish = new Chart(ctx, {
     type: 'doughnut',
@@ -1471,8 +1558,8 @@ function drawFishChart() {
       datasets: [{
         data,
         backgroundColor: labels.map((_, i) => colors[i % colors.length]),
-        borderColor: '#161e22',
-        borderWidth: 2,
+        borderColor: '#ffffff',
+        borderWidth: 3,
       }]
     },
     options: {
@@ -1482,7 +1569,7 @@ function drawFishChart() {
         legend: {
           position: 'right',
           labels: {
-            color: '#e8e2d4',
+            color: '#1f2426',
             font: { family: 'JetBrains Mono', size: 11 }
           }
         }
@@ -1498,29 +1585,25 @@ function chartOpts() {
     plugins: {
       legend: {
         labels: {
-          color: '#e8e2d4',
+          color: '#1f2426',
           font: { family: 'JetBrains Mono', size: 11 }
         }
       }
     },
     scales: {
       x: {
-        grid: { color: 'rgba(42,57,64,.5)' },
-        ticks: { color: '#9aa6a8', font: { family: 'JetBrains Mono', size: 10 } }
+        grid: { color: 'rgba(227,221,208,.7)' },
+        ticks: { color: '#6b7378', font: { family: 'JetBrains Mono', size: 10 } }
       },
       y: {
-        grid: { color: 'rgba(42,57,64,.5)' },
-        ticks: { color: '#9aa6a8', font: { family: 'JetBrains Mono', size: 10 } }
+        grid: { color: 'rgba(227,221,208,.7)' },
+        ticks: { color: '#6b7378', font: { family: 'JetBrains Mono', size: 10 } }
       }
     }
   };
 }
 
-/* =========================================================
-   PANEL: ROK
-   ========================================================= */
 function renderYear() {
-  // wybór roku
   const years = new Set();
   Object.keys(state.revenues).forEach(k => years.add(parseInt(k.split('-')[0])));
   Object.keys(state.orders).forEach(k => years.add(parseInt(k.split('-W')[0])));
@@ -1534,7 +1617,6 @@ function renderYear() {
     `<button class="year-btn ${y === currentYear ? 'active' : ''}" onclick="selectYear(${y})">${y}</button>`
   ).join('');
 
-  // staty rok
   let totalRev = 0, totalCost = 0, totalKg = 0;
   Object.entries(state.revenues).forEach(([k, v]) => {
     if (k.startsWith(currentYear + '-')) totalRev += v.amount || 0;
@@ -1542,7 +1624,7 @@ function renderYear() {
   Object.entries(state.orders).forEach(([wk, ords]) => {
     if (wk.startsWith(currentYear + '-W')) {
       ords.forEach(o => {
-        totalCost += o.cost || 0;
+        totalCost += (o.kg * o.pricePerKg || 0);
         totalKg += o.kg || 0;
       });
     }
@@ -1566,7 +1648,6 @@ function renderYear() {
     </div>
   `;
 
-  // miesiące
   const months = Array.from({length: 12}, () => ({ rev: 0, cost: 0 }));
   Object.entries(state.revenues).forEach(([k, v]) => {
     const [y, m] = k.split('-');
@@ -1581,7 +1662,7 @@ function renderYear() {
     const monStart = addDays(jan4, -jan4Day + (wkNum-1)*7);
     const mid = addDays(monStart, 3);
     if (mid.getFullYear() !== currentYear) return;
-    const c = ords.reduce((s, o) => s + (o.cost||0), 0);
+    const c = ords.reduce((s, o) => s + (o.kg * o.pricePerKg || 0), 0);
     months[mid.getMonth()].cost += c;
   });
 
@@ -1602,9 +1683,6 @@ function selectYear(y) {
   renderYear();
 }
 
-/* =========================================================
-   IMPORT / EKSPORT
-   ========================================================= */
 function exportJSON() {
   const data = JSON.stringify(state, null, 2);
   const blob = new Blob([data], { type: 'application/json' });
@@ -1626,11 +1704,33 @@ function importJSON(e) {
       const data = JSON.parse(ev.target.result);
       if (!data.revenues && !data.orders && !data.fishTypes) throw new Error('Nieprawidłowy format');
       if (!confirm('Zaimportować dane? Bieżące zostaną nadpisane.')) return;
+
+      const orders = {};
+      Object.entries(data.orders || {}).forEach(([wk, ords]) => {
+        orders[wk] = ords.map(o => {
+          if (o.pricePerKg !== undefined) return o;
+          return {
+            fishId: o.fishId,
+            kg: o.kg || 0,
+            pricePerKg: (o.kg && o.cost) ? (o.cost / o.kg) : 0
+          };
+        });
+      });
+
       state = {
         revenues: data.revenues || {},
-        orders: data.orders || {},
-        fishTypes: data.fishTypes || [],
+        orders,
+        fishTypes: (data.fishTypes || []).map(f => ({ ...f, lastPrice: f.lastPrice || 0 })),
       };
+
+      const sortedWks = Object.keys(state.orders).sort();
+      sortedWks.forEach(wk => {
+        state.orders[wk].forEach(o => {
+          const f = state.fishTypes.find(x => x.id === o.fishId);
+          if (f && o.pricePerKg > 0) f.lastPrice = o.pricePerKg;
+        });
+      });
+
       save();
       renderWeek();
       renderFishTypes();
@@ -1643,9 +1743,6 @@ function importJSON(e) {
   e.target.value = '';
 }
 
-/* =========================================================
-   STARTUP
-   ========================================================= */
 load();
 renderWeek();
 
